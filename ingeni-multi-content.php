@@ -5,12 +5,17 @@ Plugin URI: https://github.com/BruceMcKinnon/ingeni-multi-content
 Description: Flexible CPT that supports multiple content blocks within a single post.
 Author: Bruce McKinnon
 Author URI: https://ingeni.net
-Version: 2021.01
+Version: 2021.02
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
 
 2021.01 - Initial version
+
+2021.02 - 27 Apr 2021 - Added support for Content Block #4
+											- Re-factored some of the load/save functions
+											- Added support for Content #1 title
+											- Added support for specifying a data-id attrib
 
 
 */
@@ -33,15 +38,6 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 
 			} else {
 				add_shortcode( 'ingeni-multi-block', array( &$this, 'ingeni_multi_block_shortcode' ) );
-
-
-				//add_action('wp_head', array( &$this, 'bl_insert_custom_script'), 20 );
-
-				// And enqueue the Leaflet apis
-				//add_action( 'wp_enqueue_scripts', array( &$this, 'bl_enqueue_leaflet' ) );
-
-				//add_action('wp_head', array( &$this, 'bl_insert_google_analytics' ));
-				//add_action('wp_footer', array( &$this, 'echo_json_ld' ));
 			}
 		}
 
@@ -180,9 +176,9 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 		public function imc_add_meta_boxes( ) {
 
 			add_meta_box(
-				'imc_content2_title',
-				__( 'Content #2 Title', 'textdomain' ),
-				array( &$this, 'render_imc_content2_title' ),
+				'imc_content1_title',
+				__( 'Content #1 Title', 'textdomain' ),
+				array( &$this, 'render_imc_content1_title' ),
 				'ingeni_multicontent',
 				'normal',
 				'high'
@@ -192,6 +188,24 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 				'imc_content2',
 				__( 'Content #2', 'textdomain' ),
 				array( &$this, 'render_imc_content2' ),
+				'ingeni_multicontent',
+				'normal',
+				'high'
+			);
+			
+			add_meta_box(
+				'imc_content2_title',
+				__( 'Content #2 Title', 'textdomain' ),
+				array( &$this, 'render_imc_content2_title' ),
+				'ingeni_multicontent',
+				'normal',
+				'high'
+			);
+
+			add_meta_box(
+				'imc_content3',
+				__( 'Content #3', 'textdomain' ),
+				array( &$this, 'render_imc_content3' ),
 				'ingeni_multicontent',
 				'normal',
 				'high'
@@ -207,9 +221,18 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 			);
 
 			add_meta_box(
-				'imc_content3',
-				__( 'Content #3', 'textdomain' ),
-				array( &$this, 'render_imc_content3' ),
+				'imc_content4',
+				__( 'Content #4', 'textdomain' ),
+				array( &$this, 'render_imc_content4' ),
+				'ingeni_multicontent',
+				'normal',
+				'high'
+			);
+			
+			add_meta_box(
+				'imc_content4_title',
+				__( 'Content #4 Title', 'textdomain' ),
+				array( &$this, 'render_imc_content4_title' ),
 				'ingeni_multicontent',
 				'normal',
 				'high'
@@ -217,93 +240,57 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 		}
 
 		// Render Meta Box content.
-		public function render_imc_content2_title( $post ) {
-
+		public function render_imc_content_title( $post, $block = 1 ) {
 			// Add an nonce field so we can check for it later.
-			wp_nonce_field(  plugin_basename( __FILE__ ), 'imc_content2_title_nonce' );
+			wp_nonce_field(  plugin_basename( __FILE__ ), 'imc_content'.$block.'_title_nonce' );
 
 			// Use get_post_meta to retrieve an existing value from the database.
-			$value = get_post_meta( $post->ID, '_imc_content2_title', true );
+			$value = get_post_meta( $post->ID, '_imc_content'.$block.'_title', true );
 
 			// Display the form, using the current value.
 			?>
-			<label for="imc_content2_title">Content #2 Title: </label>
-			<input type="text" autocomplete="off" name="imc_content2_title" id="imc_content2_title" value="<?php echo($value); ?>" />
+			<label for="imc_content1_title">Content #<?php echo($block); ?> Title: </label>
+			<input type="text" autocomplete="off" name="imc_content<?php echo($block); ?>_title" id="imc_content<?php echo($block); ?>_title" value="<?php echo($value); ?>" />
+			<?php
+		}
+
+		public function render_imc_content1_title( $post ) {
+			$this->render_imc_content_title( $post, 1 );
+		}
+		public function render_imc_content2_title( $post ) {
+			$this->render_imc_content_title( $post, 2 );
+		}
+		public function render_imc_content3_title( $post ) {
+			$this->render_imc_content_title( $post, 3 );
+		}
+		public function render_imc_content4_title( $post ) {
+			$this->render_imc_content_title( $post, 4 );
+		}
+
+
+		public function render_imc_content( $post, $block ) {
+
+			// Add an nonce field so we can check for it later.
+			wp_nonce_field(  plugin_basename( __FILE__ ), 'imc_content'.$block.'_nonce' );
+
+			// Use get_post_meta to retrieve an existing value from the database.
+			$value = get_post_meta( $post->ID, '_imc_content'.$block, true );
+
+			// Display the form, using the current value.
+			?>
+			<textarea class="wp-editor-area" style="height:250px;width:100%;" autocomplete="off" cols="40" name="imc_content<?php echo($block); ?>" id="imc_content<?php echo($block); ?>"><?php echo($value); ?></textarea>
 			<?php
 		}
 
 		public function render_imc_content2( $post ) {
-
-			// Add an nonce field so we can check for it later.
-			wp_nonce_field(  plugin_basename( __FILE__ ), 'imc_content2_nonce' );
-
-			// Use get_post_meta to retrieve an existing value from the database.
-			$value = get_post_meta( $post->ID, '_imc_content2', true );
-
-			// Display the form, using the current value.
-			?>
-			<textarea class="wp-editor-area" style="height:250px;width:100%;" autocomplete="off" cols="40" name="imc_content2" id="imc_content2"><?php echo($value); ?></textarea>
-			<?php
+			$this->render_imc_content( $post, 2 );
 		}
-
-		public function render_imc_content3_title( $post ) {
-
-			// Add an nonce field so we can check for it later.
-			wp_nonce_field(  plugin_basename( __FILE__ ), 'imc_content3_title_nonce' );
-
-			// Use get_post_meta to retrieve an existing value from the database.
-			$value = get_post_meta( $post->ID, '_imc_content3_title', true );
-
-			// Display the form, using the current value.
-			?>
-			<label for="imc_content3_title">Content #3 Title: </label>
-			<input type="text" autocomplete="off" name="imc_content3_title" id="imc_content3_title" value="<?php echo($value); ?>" />
-			<?php
-		}
-
 		public function render_imc_content3( $post ) {
-
-			// Add an nonce field so we can check for it later.
-			wp_nonce_field(  plugin_basename( __FILE__ ), 'imc_content3_nonce' );
-
-			// Use get_post_meta to retrieve an existing value from the database.
-			$value = get_post_meta( $post->ID, '_imc_content3', true );
-
-			// Display the form, using the current value.
-			?>
-			<textarea class="wp-editor-area" style="height:250px;width:100%;" autocomplete="off" cols="40" name="imc_content3" id="imc_content3"><?php echo($value); ?></textarea>
-			<?php
+			$this->render_imc_content( $post, 3 );
 		}
-
-		public function render_imc_content4_title( $post ) {
-
-			// Add an nonce field so we can check for it later.
-			wp_nonce_field(  plugin_basename( __FILE__ ), 'imc_content4_title_nonce' );
-
-			// Use get_post_meta to retrieve an existing value from the database.
-			$value = get_post_meta( $post->ID, '_imc_content4_title', true );
-
-			// Display the form, using the current value.
-			?>
-			<label for="imc_content4_title">Content #4 Title: </label>
-			<input type="text" autocomplete="off" name="imc_content4_title" id="imc_content4_title" value="<?php echo($value); ?>" />
-			<?php
-		}
-
 		public function render_imc_content4( $post ) {
-
-			// Add an nonce field so we can check for it later.
-			wp_nonce_field(  plugin_basename( __FILE__ ), 'imc_content4_nonce' );
-
-			// Use get_post_meta to retrieve an existing value from the database.
-			$value = get_post_meta( $post->ID, '_imc_content4', true );
-
-			// Display the form, using the current value.
-			?>
-			<textarea class="wp-editor-area" style="height:250px;width:100%;" autocomplete="off" cols="40" name="imc_content4" id="imc_content4"><?php echo($value); ?></textarea>
-			<?php
+			$this->render_imc_content( $post, 4 );
 		}
-
 
 
 		// Save the meta when the post is saved
@@ -332,6 +319,11 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 			}
 
 			// OK, it's safe for us to save the data now.
+
+			// Sanitize the user input.
+			$new_content1_title = $_POST['imc_content1_title'];
+			// Update the meta field.
+			update_post_meta( $post_id, '_imc_content1_title', $new_content1_title );
 
 			// Sanitize the user input.
 			$new_content2_title = $_POST['imc_content2_title'];
@@ -364,7 +356,6 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 	}
 
 
-
 	public function ingeni_multi_block_shortcode( $atts ) {
 		$params = shortcode_atts( array(
 			'id' => 0,
@@ -372,9 +363,14 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 			'show_title' => 1,
 			'show_content' => 1,
 			'class' => 'imc_wrapper',
+			'data-id' => '',
 		), $atts );
 
-		$retHtml = '<div class="' . $params['class'] . '">';
+		$data_id = '';
+		if (is_numeric($params['data-id'])) {
+			$data_id = ' data-id="'.$params['data-id'].'"';
+		}
+		$retHtml = '<div class="' . $params['class'] . '"' . $data_id . '>';
 
 		if( $params["id"] != "" ) {
 			$args = array(
@@ -385,7 +381,7 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 			$content_post = get_posts( $args );
 	
 			foreach( $content_post as $post ) {
-				$content_num = $params['content'];
+				$content_num = $params['content_id'];
 				if (($content_num < 1)||($content_num > 4)) {
 					$content_num = 1;
 				}
@@ -394,7 +390,12 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 					$retHtml .= get_post_meta( $post->ID, '_imc_content'.$content_num.'_title', true );
 				}
 				if ($params['show_content'] > 0) {
-					$retHtml .= get_post_meta( $post->ID, '_imc_content'.$content_num, true );
+					if ($content_num > 1) {
+						$retHtml .= get_post_meta( $post->ID, '_imc_content'.$content_num, true );
+					} else {
+						$content = get_post( $post->ID );
+						$retHtml .= $content->post_content;
+					}
 				}
 			}
 		} else {
@@ -402,13 +403,11 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 		}
 
 		$retHtml .= '</div>';
+
+		return $retHtml;
 	}
 
-
-
-
 	} // End of Class
-
 
 } // End class_exists
 
