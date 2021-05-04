@@ -5,7 +5,7 @@ Plugin URI: https://github.com/BruceMcKinnon/ingeni-multi-content
 Description: Flexible CPT that supports multiple content blocks within a single post.
 Author: Bruce McKinnon
 Author URI: https://ingeni.net
-Version: 2021.02
+Version: 2021.03
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
@@ -16,6 +16,8 @@ License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 											- Re-factored some of the load/save functions
 											- Added support for Content #1 title
 											- Added support for specifying a data-id attrib
+
+2021.03 - 4 May 2021 - Shortcode - If the class parameter is passed in as blank, don;t wrap the content in a DIV.
 
 
 */
@@ -370,7 +372,10 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 		if (is_numeric($params['data-id'])) {
 			$data_id = ' data-id="'.$params['data-id'].'"';
 		}
-		$retHtml = '<div class="' . $params['class'] . '"' . $data_id . '>';
+
+		if ($params['class'] != '') {
+			$retHtml = '<div class="' . $params['class'] . '"' . $data_id . '>';
+		}
 
 		if( $params["id"] != "" ) {
 			$args = array(
@@ -402,7 +407,9 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 			$retHtml .= '<p>Post ID '.$params["id"].' not found!</p>';
 		}
 
-		$retHtml .= '</div>';
+		if ($params['class'] != '') {
+			$retHtml .= '</div>';
+		}
 
 		return $retHtml;
 	}

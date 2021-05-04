@@ -4,7 +4,7 @@ Contributors: Bruce McKinnon
 Tags: content
 Requires at least: 5.0
 Tested up to: 5.7
-Stable tag: 2021.01
+Stable tag: 2021.03
 
 A custom post type that allows you to store four discrete blocks of content in a single post.
 
@@ -52,14 +52,14 @@ show_title = Show the title of the content block. Default is 1.
 
 show_content = Show the content of the content block. Default is 1.
 
-class = A wrapper class. Defaults is 'imc_wrapper'.
+class = A wrapper class. Defaults is 'imc_wrapper'. If a blank class is provided, then no wrapping div is applied to the returned HTML.
 
 data-id = A 'data-id' attribute that can be used by JS.
 
 
 For example:
 
-[ingeni-multi-block id=123 content=3 show_title=0 show_content=1 class="my_content_3_no_title"]
+[ingeni-multi-block id=123 content_id=3 show_title=0 show_content=1 class="my_content_3_no_title"]
 
 
 
