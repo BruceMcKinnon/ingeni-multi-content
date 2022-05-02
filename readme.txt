@@ -4,7 +4,7 @@ Contributors: Bruce McKinnon
 Tags: content
 Requires at least: 5.0
 Tested up to: 5.7
-Stable tag: 2021.03
+Stable tag: 2022.01
 
 A custom post type that allows you to store four discrete blocks of content in a single post.
 
@@ -136,4 +136,5 @@ function toggleVerticalAccordionPanel(dataId) {
 	- Added support for Content #1 title
 	- Added support for specifying a data-id attrib
 
-
+2022.01 - 2 May 2022 - Test existence of imc_content2_nonce before verifying it.
+	- Removed call to uninstall() hook.

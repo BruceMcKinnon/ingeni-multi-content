@@ -5,7 +5,7 @@ Plugin URI: https://github.com/BruceMcKinnon/ingeni-multi-content
 Description: Flexible CPT that supports multiple content blocks within a single post.
 Author: Bruce McKinnon
 Author URI: https://ingeni.net
-Version: 2021.03
+Version: 2022.01
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
@@ -19,7 +19,8 @@ License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
 2021.03 - 4 May 2021 - Shortcode - If the class parameter is passed in as blank, don;t wrap the content in a DIV.
 
-
+2022.01 - 2 May 2022 - Test existence of imc_content2_nonce before verifying it.
+						- Removed call to uninstall() hook.
 */
 
 if ( !class_exists( 'IngeniMultiBlocks' ) ) {
@@ -42,6 +43,8 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 				add_shortcode( 'ingeni-multi-block', array( &$this, 'ingeni_multi_block_shortcode' ) );
 			}
 		}
+
+
 
 		function activate() {
 				$this->cpt_init();
@@ -85,22 +88,22 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 				'rewrite' => array( 'slug' => 'imc' ), // my custom slug
 				'menu_icon'   => 'dashicons-layout',
 				// Features this CPT supports in Post Editor
-        'supports' => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'revisions', 'custom-fields', ),
-				// A hierarchical CPT is like Pages and can have Parent and child items.
-				// A non-hierarchical CPT is like Posts
-        'hierarchical' => false,
-        'public' => true,
-        'show_ui' => true,
-        'show_in_menu' => true,
-        'show_in_nav_menus' => true,
-        'show_in_admin_bar' => true,
-        'menu_position' => 5,
-        'can_export' => true,
-        'has_archive' => true,
-        'exclude_from_search' => false,
-        'publicly_queryable' => true,
-        'capability_type' => 'post',
-        'show_in_rest' => true,
+				'supports' => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'revisions', 'custom-fields', ),
+						// A hierarchical CPT is like Pages and can have Parent and child items.
+						// A non-hierarchical CPT is like Posts
+				'hierarchical' => false,
+				'public' => true,
+				'show_ui' => true,
+				'show_in_menu' => true,
+				'show_in_nav_menus' => true,
+				'show_in_admin_bar' => true,
+				'menu_position' => 5,
+				'can_export' => true,
+				'has_archive' => true,
+				'exclude_from_search' => false,
+				'publicly_queryable' => true,
+				'capability_type' => 'post',
+				'show_in_rest' => true,
 				'taxonomies' => array('category','post_tag'),
 				)
 			);
@@ -301,9 +304,11 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 			if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 
 			return;
 
-			if ( !wp_verify_nonce( $_POST['imc_content2_nonce'], plugin_basename( __FILE__ ) ) ) {
-				$this->fb_log('bad nonce');
-				return;
+			if (isset($_POST['imc_content2_nonce'])) {
+				if ( !wp_verify_nonce( $_POST['imc_content2_nonce'], plugin_basename( __FILE__ ) ) ) {
+					$this->fb_log('bad nonce');
+					return;
+				}
 			}
 
 
@@ -426,6 +431,6 @@ if (class_exists('IngeniMultiBlocks')) {
 
 register_activation_hook(__FILE__, array($multiBlocks, 'activate'));
 register_deactivation_hook(__FILE__, array($multiBlocks, 'deactivate'));
-register_uninstall_hook(__FILE__, array($multiBlocks, 'uninstall'));
+//register_uninstall_hook(__FILE__, array($multiBlocks, 'uninstall'));
 
 ?>
