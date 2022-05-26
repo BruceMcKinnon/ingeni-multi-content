@@ -4,7 +4,7 @@ Contributors: Bruce McKinnon
 Tags: content
 Requires at least: 5.0
 Tested up to: 5.7
-Stable tag: 2022.03
+Stable tag: 2022.04
 
 A custom post type that allows you to store four discrete blocks of content in a single post.
 
@@ -142,4 +142,6 @@ function toggleVerticalAccordionPanel(dataId) {
 2022.02 - 25 May 2022 - imc_content_save() - Test if post_type is set within $POST
 
 2022.03 - 27 May 2022 - imc_content_save() - More checking of $POST fields before attempting to save.
+
+2022.04 - 27 May 2022 - imc_content_save() - fixed simple syntax error.
 

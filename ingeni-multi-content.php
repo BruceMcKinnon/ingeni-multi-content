@@ -24,6 +24,7 @@ License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
 2022.02 - 25 May 2022 - imc_content_save() - Test if post_type is set within $POST
 2022.03 - 27 May 2022 - imc_content_save() - More checking of $POST fields before attempting to save.
+2022.04 - 27 May 2022 - imc_content_save() - fixed simple syntax error.
 
 */
 
@@ -362,12 +363,12 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 			}
 
 			if ( isset($_POST['imc_content3']) ) {
-			// Sanitize the user input.
-			$new_content3 = $_POST['imc_content3'];
-			// Update the meta field.
-			update_post_meta( $post_id, '_imc_content3', $new_content3 );
+				// Sanitize the user input.
+				$new_content3 = $_POST['imc_content3'];
+				// Update the meta field.
+				update_post_meta( $post_id, '_imc_content3', $new_content3 );
+			}
 
-		
 			if ( isset($_POST['imc_content4_title']) ) {
 				// Sanitize the user input.
 				$new_content4_title = $_POST['imc_content4_title'];
@@ -381,64 +382,64 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 				// Update the meta field.
 				update_post_meta( $post_id, '_imc_content4', $new_content4 );
 			}
-	}
-
-
-	public function ingeni_multi_block_shortcode( $atts ) {
-		$params = shortcode_atts( array(
-			'id' => 0,
-			'content_id' => 1,
-			'show_title' => 1,
-			'show_content' => 1,
-			'class' => 'imc_wrapper',
-			'data-id' => '',
-		), $atts );
-
-		$data_id = '';
-		if (is_numeric($params['data-id'])) {
-			$data_id = ' data-id="'.$params['data-id'].'"';
 		}
-
-		if ($params['class'] != '') {
-			$retHtml = '<div class="' . $params['class'] . '"' . $data_id . '>';
-		}
-
-		if( $params["id"] != "" ) {
-			$args = array(
-				'post__in' => array( $params["id"] ),
-				'post_type' => 'ingeni_multicontent',
-			);
 	
-			$content_post = get_posts( $args );
-	
-			foreach( $content_post as $post ) {
-				$content_num = $params['content_id'];
-				if (($content_num < 1)||($content_num > 4)) {
-					$content_num = 1;
-				}
 
-				if ($params['show_title'] > 0) {
-					$retHtml .= get_post_meta( $post->ID, '_imc_content'.$content_num.'_title', true );
-				}
-				if ($params['show_content'] > 0) {
-					if ($content_num > 1) {
-						$retHtml .= get_post_meta( $post->ID, '_imc_content'.$content_num, true );
-					} else {
-						$content = get_post( $post->ID );
-						$retHtml .= $content->post_content;
+		public function ingeni_multi_block_shortcode( $atts ) {
+			$params = shortcode_atts( array(
+				'id' => 0,
+				'content_id' => 1,
+				'show_title' => 1,
+				'show_content' => 1,
+				'class' => 'imc_wrapper',
+				'data-id' => '',
+			), $atts );
+
+			$data_id = '';
+			if (is_numeric($params['data-id'])) {
+				$data_id = ' data-id="'.$params['data-id'].'"';
+			}
+
+			if ($params['class'] != '') {
+				$retHtml = '<div class="' . $params['class'] . '"' . $data_id . '>';
+			}
+
+			if( $params["id"] != "" ) {
+				$args = array(
+					'post__in' => array( $params["id"] ),
+					'post_type' => 'ingeni_multicontent',
+				);
+		
+				$content_post = get_posts( $args );
+		
+				foreach( $content_post as $post ) {
+					$content_num = $params['content_id'];
+					if (($content_num < 1)||($content_num > 4)) {
+						$content_num = 1;
+					}
+
+					if ($params['show_title'] > 0) {
+						$retHtml .= get_post_meta( $post->ID, '_imc_content'.$content_num.'_title', true );
+					}
+					if ($params['show_content'] > 0) {
+						if ($content_num > 1) {
+							$retHtml .= get_post_meta( $post->ID, '_imc_content'.$content_num, true );
+						} else {
+							$content = get_post( $post->ID );
+							$retHtml .= $content->post_content;
+						}
 					}
 				}
+			} else {
+				$retHtml .= '<p>Post ID '.$params["id"].' not found!</p>';
 			}
-		} else {
-			$retHtml .= '<p>Post ID '.$params["id"].' not found!</p>';
-		}
 
-		if ($params['class'] != '') {
-			$retHtml .= '</div>';
-		}
+			if ($params['class'] != '') {
+				$retHtml .= '</div>';
+			}
 
-		return $retHtml;
-	}
+			return $retHtml;
+		}
 
 	} // End of Class
 
