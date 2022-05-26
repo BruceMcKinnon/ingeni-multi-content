@@ -5,7 +5,7 @@ Plugin URI: https://github.com/BruceMcKinnon/ingeni-multi-content
 Description: Flexible CPT that supports multiple content blocks within a single post.
 Author: Bruce McKinnon
 Author URI: https://ingeni.net
-Version: 2022.01
+Version: 2022.03
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
@@ -21,6 +21,10 @@ License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
 2022.01 - 2 May 2022 - Test existence of imc_content2_nonce before verifying it.
 						- Removed call to uninstall() hook.
+
+2022.02 - 25 May 2022 - imc_content_save() - Test if post_type is set within $POST
+2022.03 - 27 May 2022 - imc_content_save() - More checking of $POST fields before attempting to save.
+
 */
 
 if ( !class_exists( 'IngeniMultiBlocks' ) ) {
@@ -313,53 +317,70 @@ if ( !class_exists( 'IngeniMultiBlocks' ) ) {
 
 
 			// Check the user's permissions.
-			if ( 'page' == $_POST['post_type'] ) {
-				if ( ! current_user_can( 'edit_page', $post_id ) ) {
-					$this->fb_log('cant edit page');
-						return $post_id;
-				}
-			} else {
-				if ( ! current_user_can( 'edit_post', $post_id ) ) {
-					$this->fb_log('cant edit');
-						return $post_id;
+			if ( isset($_POST['post_type']) ) {
+				if ( 'page' == $_POST['post_type'] ) {
+					if ( ! current_user_can( 'edit_page', $post_id ) ) {
+						$this->fb_log('cant edit page');
+							return $post_id;
+					}
+				} else {
+					if ( ! current_user_can( 'edit_post', $post_id ) ) {
+						$this->fb_log('cant edit');
+							return $post_id;
+					}
 				}
 			}
 
 			// OK, it's safe for us to save the data now.
 
 			// Sanitize the user input.
-			$new_content1_title = $_POST['imc_content1_title'];
-			// Update the meta field.
-			update_post_meta( $post_id, '_imc_content1_title', $new_content1_title );
+			if ( isset($_POST['imc_content1_title']) ) {
+				$new_content1_title = $_POST['imc_content1_title'];
+				// Update the meta field.
+				update_post_meta( $post_id, '_imc_content1_title', $new_content1_title );
+			}
 
-			// Sanitize the user input.
-			$new_content2_title = $_POST['imc_content2_title'];
-			// Update the meta field.
-			update_post_meta( $post_id, '_imc_content2_title', $new_content2_title );
-			// Sanitize the user input.
-			$new_content2 = $_POST['imc_content2'];
-			// Update the meta field.
-			update_post_meta( $post_id, '_imc_content2', $new_content2 );
+			if ( isset($_POST['imc_content2_title']) ) {
+				// Sanitize the user input.
+				$new_content2_title = $_POST['imc_content2_title'];
+				// Update the meta field.
+				update_post_meta( $post_id, '_imc_content2_title', $new_content2_title );
+			}
+
+			if ( isset($_POST['imc_content2']) ) {
+				// Sanitize the user input.
+				$new_content2 = $_POST['imc_content2'];
+				// Update the meta field.
+				update_post_meta( $post_id, '_imc_content2', $new_content2 );
+			}
 	
-	
-			// Sanitize the user input.
-			$new_content3_title = $_POST['imc_content3_title'];
-			// Update the meta field.
-			update_post_meta( $post_id, '_imc_content3_title', $new_content3_title );
+			if ( isset($_POST['imc_content3_title']) ) {
+				// Sanitize the user input.
+				$new_content3_title = $_POST['imc_content3_title'];
+				// Update the meta field.
+				update_post_meta( $post_id, '_imc_content3_title', $new_content3_title );
+			}
+
+			if ( isset($_POST['imc_content3']) ) {
 			// Sanitize the user input.
 			$new_content3 = $_POST['imc_content3'];
 			// Update the meta field.
 			update_post_meta( $post_id, '_imc_content3', $new_content3 );
+
 		
-	
-			// Sanitize the user input.
-			$new_content4_title = $_POST['imc_content4_title'];
-			// Update the meta field.
-			update_post_meta( $post_id, '_imc_content4_title', $new_content4_title );
-			// Sanitize the user input.
-			$new_content4 = $_POST['imc_content4'];
-			// Update the meta field.
-			update_post_meta( $post_id, '_imc_content4', $new_content4 );
+			if ( isset($_POST['imc_content4_title']) ) {
+				// Sanitize the user input.
+				$new_content4_title = $_POST['imc_content4_title'];
+				// Update the meta field.
+				update_post_meta( $post_id, '_imc_content4_title', $new_content4_title );
+			}
+
+			if ( isset($_POST['imc_content4']) ) {
+				// Sanitize the user input.
+				$new_content4 = $_POST['imc_content4'];
+				// Update the meta field.
+				update_post_meta( $post_id, '_imc_content4', $new_content4 );
+			}
 	}
 
 
